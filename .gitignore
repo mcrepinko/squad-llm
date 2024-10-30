@@ -1,3 +1,17 @@
+# misc
+*.BK
+*.bk
+data/
+model/
+
+# vscode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
