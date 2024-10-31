@@ -1,11 +1,10 @@
 import numpy as np
 import importlib
-
+import os
 from functools import partial
-from transformers import (AutoTokenizer, DataCollatorForSeq2Seq,
-    AutoModelForSeq2SeqLM, Seq2SeqTrainingArguments, Seq2SeqTrainer, pipeline,
-    set_seed, T5ForConditionalGeneration, T5Tokenizer, Trainer,
-    TrainingArguments, GenerationConfig
+from transformers import (DataCollatorForSeq2Seq, GenerationConfig,
+    Seq2SeqTrainingArguments, Seq2SeqTrainer, pipeline,
+    set_seed, T5ForConditionalGeneration, T5Tokenizer
 )
 from transformers.optimization import Adafactor, AdafactorSchedule
 from utils import load_dataset_from_disk, tokenize_dataset, get_reduced_dataset
@@ -28,7 +27,9 @@ def compute_metrics(eval_pred):
     decoded_labels = ["\n".join(label.strip() for label in decoded_labels)]
 
     # Calculate ROUGE scores
-    result = rouge_metric.compute(predictions=decoded_preds, references=decoded_labels, use_stemmer=True)
+    result = rouge_metric.compute(
+        predictions=decoded_preds, references=decoded_labels, use_stemmer=True
+    )
     
     # Extract and format individual ROUGE metrics
     result = {key: value * 100 for key, value in result.items()}
@@ -46,7 +47,7 @@ dataset = load_dataset_from_disk(
     DATA["test_file_path"],
     DATA["validation_file_path"],
 )
-dataset = get_reduced_dataset(dataset, 50)
+dataset = get_reduced_dataset(dataset, 1000)
 
 tokenizer = T5Tokenizer.from_pretrained(MODEL["model_name"], legacy=False)
 model = T5ForConditionalGeneration.from_pretrained(
@@ -80,13 +81,12 @@ training_args = Seq2SeqTrainingArguments(
 
         # repetition_penalty=MODEL["generation_config"]["repetition_penalty"],
         # num_beams=MODEL["generation_config"]["num_beams"],
-        # # early_stopping=MODEL["generation_config"]["early_stopping"],
+        # early_stopping=MODEL["generation_config"]["early_stopping"],
         # top_k=MODEL["generation_config"]["top_k"],
-        # # # top_p=MODEL["generation_config"]["top_p"],
-        # # do_sample=MODEL["generation_config"]["do_sample"],
+        # top_p=MODEL["generation_config"]["top_p"],
+        # do_sample=MODEL["generation_config"]["do_sample"],
     ),
 )
-print(training_args.generation_config)
 
 trainer = Seq2SeqTrainer(
     model=model,
@@ -97,19 +97,28 @@ trainer = Seq2SeqTrainer(
     compute_metrics=compute_metrics,
 )
 
-print("-------- EVALUATION BEFORE TRAINING -------- ")
+print("\n-------- PRINT CONFIG -------- ")
+print(f"{DATA=}")
+print(f"{MODEL=}")
+print(f"{TRAINER_ARGUMENTS=}")
+print(f"{training_args.generation_config=}")
+
+print("\n-------- EVALUATION BEFORE TRAINING -------- ")
 model.eval()
 metric = trainer.evaluate()
 print(metric)
 
-
-print("-------- TRAINING... -------- ")
+print("\n-------- TRAINING... -------- ")
 model.train()
 trainer.eval_dataset=dataset["validation"]
 trainer.train()
 
-print("-------- EVALUATION AFTER TRAINING -------- ")
+print("\n-------- EVALUATION AFTER TRAINING -------- ")
 model.eval()
 trainer.eval_dataset=dataset["test"]
 metric = trainer.evaluate()
 print(metric)
+
+trainer.save_model(os.path.join(
+    TRAINER_ARGUMENTS["output_dir"], "best"
+))

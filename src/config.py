@@ -38,13 +38,12 @@ TRAINER_ARGUMENTS = {
     "save_total_limit": 3,
     "optim": "adafactor",
     "learning_rate": 1e-3,
-    "num_train_epochs": 4,
+    "num_train_epochs": 6,
     "predict_with_generate": True,
     "fp16": True,
     "predict_with_generate": True,
     "metric_for_best_model": "rouge1",
     "report_to": "tensorboard",
-
     "gradient_accumulation_steps": 4,  # Accumulate gradients to handle smaller batches
     "gradient_checkpointing": True,    # Reduce memory consumption
 }

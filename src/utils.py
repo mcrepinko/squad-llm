@@ -1,5 +1,5 @@
 from datasets import load_dataset, DatasetDict, Dataset
-
+from transformers import PreTrainedModel, T5Tokenizer
 
 def form_inputs(example):
     example["input_text"] = f"question: {example['question']} context: {example['context']}"
@@ -126,3 +126,13 @@ def get_reduced_dataset(
     for key in dataset.keys():
         dataset[key] = dataset[key].select(range(0, size))
     return dataset
+
+
+
+def inspect_model_output_for_sample(
+    dataset: Dataset,
+    sample_size: int,
+    model: PreTrainedModel,
+    tokenizer: T5Tokenizer
+):
+    pass
