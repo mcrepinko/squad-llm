@@ -1,3 +1,5 @@
+"""Training script.
+"""
 import numpy as np
 import importlib
 import os
@@ -14,24 +16,28 @@ import config
 importlib.reload(config)
 from config import DATA, MODEL, SEED, TRAINER_ARGUMENTS
 
-def compute_metrics(eval_pred):
+def compute_metrics(eval_pred) -> dict:
+    """Compute eval metrics
+
+    Args:
+        eval_pred: Evaluation object.
+
+    Returns:
+        dict: Dict with computed metrics
+    """
     predictions, labels = eval_pred
     
-    # Decode predictions and labels
     decoded_preds = tokenizer.batch_decode(predictions, skip_special_tokens=True)
     labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
     decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
     
-    # Rouge expects a newline after each sentence
     decoded_preds = ["\n".join(pred.strip() for pred in decoded_preds)]
     decoded_labels = ["\n".join(label.strip() for label in decoded_labels)]
 
-    # Calculate ROUGE scores
     result = rouge_metric.compute(
         predictions=decoded_preds, references=decoded_labels, use_stemmer=True
     )
     
-    # Extract and format individual ROUGE metrics
     result = {key: value * 100 for key, value in result.items()}
     return result
 

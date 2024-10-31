@@ -1,3 +1,5 @@
+"""Config file.
+"""
 SEED = 420
 
 DATA = {
@@ -20,9 +22,9 @@ MODEL = {
         "max_label_len": 32,
     },
     "generation_config": {
-        "num_beams": 4,          # Beam search to improve fluency
-        "early_stopping": True,   # Stop if all beams finish early
-        "top_k": 50,       # Randomly sample among top 50 tokens
+        "num_beams": 4,
+        "early_stopping": True,
+        "top_k": 50,
         "top_p": 0.92,
         "do_sample": True,
         "repetition_penalty": 1.2
@@ -44,6 +46,6 @@ TRAINER_ARGUMENTS = {
     "predict_with_generate": True,
     "metric_for_best_model": "rouge1",
     "report_to": "tensorboard",
-    "gradient_accumulation_steps": 4,  # Accumulate gradients to handle smaller batches
-    "gradient_checkpointing": True,    # Reduce memory consumption
+    "gradient_accumulation_steps": 4,
+    "gradient_checkpointing": True,
 }

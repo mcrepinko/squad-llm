@@ -1,14 +1,19 @@
+"""Utility functions.
+"""
 from datasets import load_dataset, DatasetDict, Dataset
 from transformers import PreTrainedModel, T5Tokenizer
 
+
 def form_inputs(example):
+    """Creats the input text out of question and context.
+    """
     example["input_text"] = f"question: {example['question']} context: {example['context']}"
     return example
 
 
 def preprocess_examples(example_batch):
     """Removes unnecesarry data from the answers, multiplies contexts
-    and questions for the number of answers.
+    and questions for the number of corresponding answers.
     """
     no_answers = [
         len(example["text"]) for example in example_batch["answers"]
@@ -22,15 +27,10 @@ def preprocess_examples(example_batch):
         for q in [question]*no_answer
     ]
     answers = [a for answer in example_batch["answers"] for a in answer["text"]]
-    # texts = [
-    #     f"question: {question} context: {context}" for
-    #     question, context in zip(questions, contexts)
-    # ]
 
     return {
         "context": contexts,
         "question": questions,
-        # "text": texts,
         "answer": answers
     }
 
@@ -99,8 +99,16 @@ def tokenize_dataset(
     dataset: Dataset,
     max_inpt_len: int,
     max_label_len: int,
-    tokenizer
+    tokenizer: T5Tokenizer
 ):
+    """Tokenizes the dataset.
+
+    Args:
+        dataset (Dataset): Dataset to tokenize.
+        max_inpt_len (int): Max no. of tokens of the input.
+        max_label_len (int): Max no. of token of the labels.
+        tokenizer (T5Tokenizer): Tokenizer object.
+    """
     def _tokenize(example):
         model_inputs = tokenizer(
             example['input_text'],
@@ -123,16 +131,15 @@ def tokenize_dataset(
 def get_reduced_dataset(
     dataset: DatasetDict, size: int
 ) -> DatasetDict:
+    """Returns a sample of a  dataset.
+
+    Args:
+        dataset (DatasetDict): Dataset to sample.
+        size (int): Size of dataset to return.
+
+    Returns:
+        DatasetDict: Reduced dataset.
+    """
     for key in dataset.keys():
         dataset[key] = dataset[key].select(range(0, size))
     return dataset
-
-
-
-def inspect_model_output_for_sample(
-    dataset: Dataset,
-    sample_size: int,
-    model: PreTrainedModel,
-    tokenizer: T5Tokenizer
-):
-    pass
