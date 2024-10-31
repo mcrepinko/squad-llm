@@ -90,3 +90,16 @@ Google Colab with the free tier GPU (T-4) was also tested, but the runtime perio
 - Train on a larger sample or full dataset
 - Train on higher number of epochs
 - Maybe include some other metrics such as BLEU, exact match, LLM as a judge, etc.
+
+
+## Resources
+- https://huggingface.co/google-t5/t5-small
+- https://huggingface.co/datasets/rajpurkar/squad
+- https://discuss.huggingface.co/t/t5-finetuning-tips/684/2
+- https://help.openai.com/en/articles/4936856-what-are-tokens-and-how-to-count-them
+- https://huggingface.co/docs/transformers/tasks/question_answering
+- https://huggingface.co/docs/transformers/main_classes/trainer
+- https://huggingface.co/docs/transformers/v4.46.0/en/main_classes/text_generation
+- https://pytorch.org/tutorials/beginner/colab.html
+- https://github.com/google-research/text-to-text-transfer-transformer
+- https://github.com/google-research/text-to-text-transfer-transformer/blob/fce4b1a7fcca858482ac60579cf8b3332c594a55/t5/data/preprocessors.py#L176
