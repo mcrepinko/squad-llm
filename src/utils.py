@@ -114,6 +114,7 @@ def tokenize_dataset(
             padding="max_length",
             truncation=True,
         )
+        # labels[labels == tokenizer.pad_token_id] = -100
         model_inputs["labels"] = labels["input_ids"]
         return model_inputs
     return dataset.map(_tokenize, batched=True, num_proc=3)

@@ -1,0 +1,9 @@
+torch
+tqdm
+evaluate
+sentencepiece
+scikit-learn
+protobuf
+transformers[torch]
+bitsandbytes
+peft

@@ -1,5 +1,3 @@
-from transformers import IntervalStrategy
-
 SEED = 420
 
 DATA = {
@@ -19,35 +17,34 @@ MODEL = {
     "model_cache_path": "../model/cache",
     "hyperparams": {
         "max_inpt_len": 256,
-        "max_label_len": 256,
+        "max_label_len": 32,
+    },
+    "generation_config": {
+        "num_beams": 4,          # Beam search to improve fluency
+        "early_stopping": True,   # Stop if all beams finish early
+        "top_k": 50,       # Randomly sample among top 50 tokens
+        "top_p": 0.92,
+        "do_sample": True,
+        "repetition_penalty": 1.2
     }
 }
 
 TRAINER_ARGUMENTS = {
     "output_dir": "../model/t5_abs_qa",
-    "eval_strategy": IntervalStrategy.STEPS,
-    # "generation_num_beams": 4,
-    # "generation_max_length": 150,
-    # "evaluation_strategy": "epoch",
-    "eval_steps": 250,
-    "metric_for_best_model": "rougeL",
-    "load_best_model_at_end": True,
-    # "learning_rate": 1e-3,
-    # "learning_rate": 1.5e-4,
-    "learning_rate": 2e-4,
-    # "learning_rate": 3e-4,
-    # "learning_rate": 2e-5,
-    "per_device_train_batch_size": 4,
-    "per_device_eval_batch_size": 4,
-    "weight_decay": 0.02,
-    # "weight_decay": 0.1,
+    "eval_strategy":"epoch",
+    "per_device_train_batch_size": 2,
+    "per_device_eval_batch_size": 2,
+    "weight_decay": 0.01,
     "save_total_limit": 3,
+    "optim": "adafactor",
+    "learning_rate": 1e-3,
     "num_train_epochs": 4,
-    # "predict_with_generate": True,
-    # "fp16": True,
-    "fp16": False,
-    "push_to_hub": False,
-    "logging_steps": 50,
-    # "use_cpu": True, # should be included in latest version, but isn't
-    "no_cuda": False # will be depricated
+    "predict_with_generate": True,
+    "fp16": True,
+    "predict_with_generate": True,
+    "metric_for_best_model": "rouge1",
+    "report_to": "tensorboard",
+
+    "gradient_accumulation_steps": 4,  # Accumulate gradients to handle smaller batches
+    "gradient_checkpointing": True,    # Reduce memory consumption
 }
