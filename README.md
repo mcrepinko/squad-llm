@@ -18,7 +18,7 @@ My previous experience with fine-tuning this model, the large number of datasets
 As already mentioned, the [google-t5/t5-small](https://huggingface.co/google-t5/t5-small) was fine-tuned on the SQuAD dataset available [here](https://huggingface.co/datasets/rajpurkar/squad).
 To form the inputs to the model, a prompt similar to the one used by the authors of the T5 paper for the Trivia QA was used.  
 The inputs to the model were thus formed as: `"question: {question} context: {context}"`  
-The dataset was split into train, test and validation sets of sizes 90%, 10%, 10% respectively. The dataset comes without the test split, so the test split
+The dataset was split into train, test and validation sets of sizes 90%-, 10%-, 10% of the size of the whole dataset, respectively. The dataset originally comes without the test split, so the train split was additionally isplit into train and test sets.
 Unfortunately, because of the very constrained GPU resources, only 1000 records were taken from each of the sets. This amount was regarded sufficient to demonstrate the fine-tuning process and display and improvement in the metrics.
 
 ### Metrics
