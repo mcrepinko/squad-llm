@@ -83,6 +83,43 @@ The training lasted about 2hrs in total on a subset of 1K records.
 
 Google Colab with the free tier GPU (T-4) was also tested, but the runtime period didn't last long enough for the training to complete and the training speed was not much different from the local system.
 
+## Additional explanations why the eval loss continues do decrease throughout the whole FT process, while the Rouge-L score first increases, and then drops
+
+1. Overfitting
+Explanation: During the initial epochs, the model learns patterns in the training data that generalize well to the evaluation dataset, leading to improved ROUGE-L scores. However, as training progresses, the model begins to overfit to the training data, optimizing for loss without improving (and even degrading) its ability to generalize. This results in a decreasing ROUGE-L score despite a continuously decreasing evaluation loss.
+Evaluation: This is the most likely explanation. Overfitting is a common issue in fine-tuning, especially with smaller datasets like SQuAD. As the model prioritizes minimizing the loss, it may become overly confident in predictions that align with the training data but are less accurate in the context of evaluation metrics like ROUGE.
+2. Evaluation Metric Misalignment
+Explanation: The evaluation loss is typically based on token-level predictions (e.g., cross-entropy loss), whereas ROUGE-L is a higher-level metric that evaluates sequence similarity. The model might be improving in terms of predicting individual tokens correctly but failing to generate sequences that align well with ground-truth outputs. This could explain why the loss decreases while ROUGE-L drops after a certain point.
+Evaluation: This explanation makes sense, as token-level optimization doesn't always correlate directly with improvements in sequence-level metrics like ROUGE. However, it’s somewhat less likely to fully explain the drop since the loss decrease should ideally correlate with ROUGE improvements, assuming the generated outputs are coherent.
+3. Learning Rate Issues
+Explanation: If the learning rate is too high or poorly scheduled, the model might initially improve its predictions but later oscillate or diverge in terms of sequence-level coherence. This could lead to a scenario where the loss continues to decrease due to smaller incremental improvements, but the generated outputs become less aligned with ground truth, affecting ROUGE-L scores.
+Evaluation: This is a plausible secondary factor. Suboptimal learning rate scheduling could explain why the model stops generalizing well after a certain point, though it might not be the primary reason for the observed pattern.
+4. Dataset Imbalance or Noise
+Explanation: If certain types of examples in the dataset are overrepresented or contain noise, the model might initially improve overall performance but later disproportionately optimize for these problematic examples. This could lead to a decrease in sequence-level metrics like ROUGE-L as the model sacrifices generalization for better performance on these examples.
+Evaluation: While possible, this is less likely to be the primary cause unless there’s evidence of significant imbalance or noise in the dataset.
+5. Optimization Challenges
+Explanation: The T5 model architecture may struggle to balance token-level loss minimization with sequence-level coherence optimization, particularly on small datasets like SQuAD. Fine-tuning might initially lead to better generalization (hence, higher ROUGE-L scores), but as the model further minimizes loss, it could fall into suboptimal solutions that prioritize token-level correctness over coherent outputs.
+Evaluation: This explanation is plausible and aligns with the inherent challenges of fine-tuning transformer models on small datasets.
+
+
+### Summary of Plausibility
+Overfitting: Highly plausible and likely the primary reason.
+- Evaluation Metric Misalignment: Plausible and a strong contributing factor.
+- Learning Rate Issues: Possible, but less likely to be the primary cause.
+- Dataset Imbalance or Noise: Less likely unless confirmed by dataset analysis.
+- Optimization Challenges: Plausible, especially given the nature of fine-tuning transformers.
+
+
+### To address this issue, we can consider the following:
+Introduce regularization techniques like dropout or weight decay.
+- Use early stopping based on ROUGE-L rather than loss.
+- Experiment with smaller learning rates or better learning rate schedules.
+- Augment or clean the dataset to improve its quality and balance.
+
+Introduce regularization techniques like dropout or weight decay.
+Use early stopping based on ROUGE-L rather than loss.
+Experiment with smaller learning rates or better learning rate schedules.
+Augment or clean the dataset to improve its quality and balance.
 
 ## Areas of improvement
 - Better filter data, remove duplicate questions and redundant answers
